@@ -54,7 +54,7 @@ public class SetupRania extends javax.swing.JPanel {
         });
 
         jLabel3.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
-        jLabel3.setText("Passowrd: ");
+        jLabel3.setText("Password: ");
 
         password.setBackground(new java.awt.Color(153, 153, 153));
         password.setFont(new java.awt.Font("Dialog", 0, 48)); // NOI18N

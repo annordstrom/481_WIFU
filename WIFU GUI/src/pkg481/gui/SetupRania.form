@@ -136,7 +136,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Dialog" size="48" style="1"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Passowrd: "/>
+            <Property name="text" type="java.lang.String" value="Password: "/>
           </Properties>
         </Component>
         <Component class="javax.swing.JPasswordField" name="password">
