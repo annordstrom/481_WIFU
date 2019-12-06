@@ -55,6 +55,8 @@ for i in range(0, folds):
     
     #Fresh model generation
     
+    model_name = 'base_model_1'
+    
     model = Sequential()
     # 1st Convolutional Layer
     model.add(Conv2D(filters=96, input_shape=(150,30,12), kernel_size=(7,3), strides=(3,2), padding='valid'))
@@ -104,14 +106,14 @@ for i in range(0, folds):
     pred_val_y = model.predict(val_x, verbose = 1)
     # turning predicted weights into list of predicted labels (for confusion matrix)
     pred_vals = np.zeros((pred_val_y.shape[0],1))
-    for i in range(0,pred_val_y.shape[0]):
+    for j in range(0,pred_val_y.shape[0]):
         max_val = 0
         max_ind = 0
-        for j in range(0,pred_val_y.shape[1]):
-            if pred_val_y[i][j] > max_val:
-                max_ind = j
-                max_val = pred_val_y[i][j]
-        pred_vals[i] = max_ind
+        for k in range(0,pred_val_y.shape[1]):
+            if pred_val_y[j][k] > max_val:
+                max_ind = k
+                max_val = pred_val_y[j][k]
+        pred_vals[j] = max_ind
     # turning one-hot encoding into multiclass encoding (for confusion matrix)
     uncat_val_y = np.zeros((val_y.shape[0],1))
     for j in range(0, uncat_val_y.shape[0]):
@@ -121,12 +123,12 @@ for i in range(0, folds):
                 max_ind = k
         uncat_val_y[j] = max_ind
     # Create confusion matrix, display, and save
-    pcm(uncat_val_y, pred_vals, classes = ['Falling', 'Sitting', 'Walking', 'Laying', 'Standing'], title='Confusion Matrix for Fold ' + str(i+1), name='confusion_matrix' + str(i+1))
+    pcm(uncat_val_y, pred_vals, classes = ['Falling', 'Sitting', 'Walking', 'Laying', 'Standing'], title='Confusion Matrix for Fold ' + str(i+1), name='confusion_matrix - ' + model_name + '_fold' + str(i+1))
     pred_list = np.append(pred_list, pred_vals)
     val_list = np.append(val_list, uncat_val_y)
     del val_x, val_y, train_x, train_y
 
 # Create overall confusion matrix and print overall accuracy
-pcm(val_list, pred_list, classes = ['Falling', 'Sitting', 'Walking', 'Laying', 'Standing'], title='Confusion Matrix for Fold ' + str(i+1), name='confusion_matrix' + str(i+1))
+pcm(val_list, pred_list, classes = ['Falling', 'Sitting', 'Walking', 'Laying', 'Standing'], title='Confusion Matrix for All Folds', name='confusion_matrix_' + model_name + '_overall')
 print('\nAverage training accuracy: ' + str(ave_train_acc))
 print('Average validation accuracy: ' + str(ave_val_acc))
