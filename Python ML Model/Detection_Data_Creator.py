@@ -16,14 +16,17 @@ import numpy as np
 from collections import Counter
 import random
 from keras.utils import to_categorical
+#from keras.preprocessing.image import ImageDataGenerator
+#from matplotlib import pyplot
 
 """
 Tasks:
     1. Load in training data and labels
-    2. Shuffle data
-    3. Perform one-hot encoding
-    4. Normalize data
-    5. Save training data and labels
+    2. Data Augmentation
+    3. Shuffle data
+    4. Perform one-hot encoding
+    5. Normalize data
+    6. Save training data and labels
 """ 
 
 #1.) Loading in training data and labels
@@ -91,12 +94,14 @@ for file_dir in os.listdir(os.getcwd()): # rotate through each subject folder
                         file_labels = []
                         for line in txt:
                             file_labels.append(int(line[0]))
-                            
+                    
                     # Determine which label to use for the current sample, based on majority
                     first_ind = 0
                     end_ind = 150
                     for j in range(0,13):
                         # Count each label
+                        if file_labels[first_ind] == 0:
+                            print('Faulty collection on ' + str(file) + ': labels appear as \'0\', meaning someone didn\'t collect data properly... Nothing done now, these files will count as default \'5\'.')
                         occurence_count = Counter(file_labels[first_ind:end_ind])
                         fall_labels[13*i + j] = occurence_count.most_common(1)[0][0]
                         first_ind += 50
@@ -132,9 +137,68 @@ for file_dir in os.listdir(os.getcwd()): # rotate through each subject folder
                     print('Error on ' + file + ': Wrong array size. Data unusable. Size: ' + str(csi.shape))
             elif file.endswith('.mat'):
                 print('Corrupt file ' + file + ': .dat or .txt file does not exist for this .mat file.')
+fall_data = np.swapaxes(fall_data, 2, 3) # Swap axes
 
-# 2.) & 3.) Randomize data, swap axes and one-hot encode labels
-fall_data = np.swapaxes(fall_data, 2, 3)
+#%%
+print('Performing Data Augmentation...')
+# 2.) Data Augmentation!
+# Find indices and count number of *falls*
+fall_indices = []
+for i in range(0, len(fall_labels)):
+    if fall_labels[i] == 1: # If fall
+        fall_indices.append(i)
+num_falls = len(fall_indices)
+#%%
+augmented_falls = np.zeros((4*num_falls, np.shape(fall_data)[1], np.shape(fall_data)[2], np.shape(fall_data)[3]), dtype=int)
+augmented_fall_labels = np.ones(4*num_falls)
+
+# Augmentation 1: "Brightness" Augmentation
+brightness_scale = 64 # 1/4 full range (-127-127)
+for i in range(0, num_falls):
+    augmented_falls[i] = fall_data[fall_indices[i],:] + brightness_scale
+    
+# Augmentation 2-4, for posterity
+brightness_scale = -64
+for i in range(0, num_falls):
+    augmented_falls[i + num_falls] = fall_data[fall_indices[i],:] + brightness_scale
+brightness_scale = 32
+for i in range(0, num_falls):
+    augmented_falls[i + num_falls*2] = fall_data[fall_indices[i],:] + brightness_scale
+brightness_scale = -32
+for i in range(0, num_falls):
+    augmented_falls[i + num_falls*3] = fall_data[fall_indices[i],:] + brightness_scale
+
+fall_data = np.concatenate((fall_data, augmented_falls))
+fall_labels = np.concatenate((fall_labels, augmented_fall_labels))
+del augmented_falls, augmented_fall_labels, num_falls
+#%%
+# Find indices and count number of *sits*
+sit_indices = []
+for i in range(0, len(fall_labels)):
+    if fall_labels[i] == 2: # If sitting
+        sit_indices.append(i)
+num_sits = len(sit_indices)
+
+augmented_sits = np.zeros((2*num_sits, np.shape(fall_data)[1], np.shape(fall_data)[2], np.shape(fall_data)[3]), dtype=int)
+augmented_sit_labels = np.full((2*num_sits),2)
+
+# Augmentation 1: "Brightness" Augmentation
+brightness_scale = 64 # 1/4 full range (-127-127)
+for i in range(0, num_sits):
+    augmented_sits[i] = fall_data[sit_indices[i],:] + brightness_scale
+    
+# Augmentation 2, for posterity
+brightness_scale = -64
+for i in range(0, num_sits):
+    augmented_sits[i + num_sits] = fall_data[sit_indices[i],:] + brightness_scale
+
+
+fall_data = np.concatenate((fall_data, augmented_sits))
+fall_labels = np.concatenate((fall_labels, augmented_sit_labels))
+del augmented_sits, augmented_sit_labels, num_sits
+#%%
+
+# 3.) & 4.) Randomize data and one-hot encode labels
 print('\nRandomizing Data...')
 shuffled_fall_data = np.zeros((len(fall_data), 150, 30, 12), dtype=float)
 shuffled_fall_labels = np.zeros(len(fall_labels))
@@ -148,8 +212,8 @@ for j in shuffled_indices:
 shuffled_fall_labels = shuffled_fall_labels - 1
 shuffled_fall_labels = to_categorical(shuffled_fall_labels)
 del fall_data, fall_labels
-
-# 4.) Normalize data
+print(str(len(shuffled_fall_labels)))
+# 5.) Normalize data
 print('\nPart 1 of Normalization...')
 mini = np.amin(shuffled_fall_data)
 maxi = np.amax(shuffled_fall_data)
@@ -157,14 +221,17 @@ maxi = np.amax(shuffled_fall_data)
 print('Part 2 of Normalization...')
 
 #shuffled_fall_data = (shuffled_fall_data - mini)/(maxi - mini)
-# The below option is very time-consuming, so avoid if you have enough RAM to use above call
+
+# The below option is very time-consuming (more than 1hr for these 5 lines), so
+# avoid if you have enough RAM to use above commented call (8GB is not enough)
 for a in range(0,shuffled_fall_data.shape[0]):
+    # print(str(a))
     for b in range(0,shuffled_fall_data.shape[1]):
         for c in range(0,shuffled_fall_data.shape[2]):
             for d in range(0,shuffled_fall_data.shape[3]):
                 shuffled_fall_data[a][b][c][d] = (shuffled_fall_data[a][b][c][d] - mini)/(maxi - mini)
 
-# 5.) Save data
+# 6.) Save data
 print('\n Saving data and labels...')
 np.save('fall_data', shuffled_fall_data)
 np.save('fall_labels', shuffled_fall_labels)
