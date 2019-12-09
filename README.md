@@ -1,6 +1,6 @@
 # WIFU Fall 2019 Repository
 
-Currently contains code for the GUI 
+This repository contains source code for the Fall 2019 Wifi-based In-home Fall-detection Utility (WIFU) project, developed for the WVU LCSEE capstone program
 
 ## Note - 9/20/19
 Raspberry Pi Touch Screen Dimensions: 194mm x 110mm x 20mm
@@ -9,5 +9,6 @@ Raspberry Pi Touch Screen Dimensions: 194mm x 110mm x 20mm
 External jar needs to be added to Libraries for Java Mail to work 
 This jar is javax.mail.jar
 
-
+## 12/9/2019
+Updated with the latest version of the GUI, adding fixes for the notification process
 
