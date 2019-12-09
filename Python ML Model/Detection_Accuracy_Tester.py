@@ -59,7 +59,7 @@ for i in range(0, folds):
     
     #Fresh model generation
     
-    model_name = 'long_1'
+    model_name = 'binary_1'
     
     model = Sequential()
     # 1st Convolutional Layer
@@ -72,16 +72,16 @@ for i in range(0, folds):
     model.add(Dense(1000, activation = 'sigmoid'))
     model.add(Dropout(0.4))
     model.add(Flatten())
-    model.add(Dense(5, activation = 'softmax'))
+    model.add(Dense(1, activation = 'softmax'))
     #    model.add(Activation('softmax'))
 #    adam = optimizers.Adam(lr = 0.005)
     sgd = keras.optimizers.SGD(lr = 0.1, momentum = 0.0, nesterov = False)
     
-    model.compile(loss=keras.losses.categorical_crossentropy, optimizer=sgd, metrics=['accuracy'])
-    
+    model.compile(loss=keras.losses.binary_crossentropy, optimizer=sgd, metrics=['accuracy'])
     # *** END MODEL
     
-    metric = model.fit(x=train_x, y=train_y, validation_data=(val_x,val_y), verbose=1, epochs=3).history
+    class_weight = {"Falling": 0.727, "Daily activities": 0.273} # Change as needed
+    metric = model.fit(x=train_x, y=train_y, validation_data=(val_x,val_y), verbose=1, epochs=1, class_weights=class_weight).history
     print('Training Accuracy: ' + str(metric['acc']))
     print('Validation Accuracy: ' + str(metric['val_acc']))
     metrics[i+1] = (metric['acc'], metric['val_acc'])
@@ -89,31 +89,15 @@ for i in range(0, folds):
     ave_val_acc += (metric['val_acc'][0]/folds)
     # Do prediction, reformat predictions, plot confusion matrix, and save
     print('Predicting...')
-    pred_val_y = model.predict(val_x, verbose = 1)
-    # turning predicted weights into list of predicted labels (for confusion matrix)
-    pred_vals = np.zeros((pred_val_y.shape[0],1))
-    for j in range(0, pred_val_y.shape[0]):
-        max_val = 0
-        max_ind = 0
-        for k in range(0,pred_val_y.shape[1]):
-            if pred_val_y[j][k] > max_val:
-                max_ind = k
-                max_val = pred_val_y[j][k]
-        pred_vals[j] = max_ind
-    # turning one-hot encoded ground truth into multiclass encoding (for confusion matrix)
-    uncat_val_y = np.zeros((val_y.shape[0],1))
-    for j in range(0, uncat_val_y.shape[0]):
-        for k in range(0,val_y.shape[1]):
-            if val_y[j][k] == 1:
-                uncat_val_y[j] = k
+    val_y_predictions = model.predict(val_x, verbose = 1)
     # Create confusion matrix, display, and save
-    pcm(uncat_val_y, pred_vals, classes = ['Falling', 'Sitting', 'Walking', 'Laying', 'Standing'], title='Confusion Matrix for Fold ' + str(i+1), name='confusion_matrix - ' + model_name + '_fold' + str(i+1))
-    pred_list = np.append(pred_list, pred_vals)
-    val_list = np.append(val_list, uncat_val_y)
+    pcm(val_y, val_y_predictions, classes = ['Falling', 'Sitting', 'Walking', 'Laying', 'Standing'], title='Confusion Matrix for Fold ' + str(i+1), name='confusion_matrix - ' + model_name + '_fold' + str(i+1))
+    pred_list = np.append(pred_list, val_y_predictions)
+    val_list = np.append(val_list, val_y)
     del val_x, val_y, train_x, train_y
 
 # Create overall confusion matrix and print overall accuracy
-pcm(val_list, pred_list, classes = ['Falling', 'Sitting', 'Walking', 'Laying', 'Standing'], title='Confusion Matrix for All Folds', name='confusion_matrix_' + model_name + '_overall')
+pcm(val_list, pred_list, classes = ['Falling', 'Daily Activity'], title='Confusion Matrix for All Folds', name='confusion_matrix_' + model_name + '_overall')
 print('\nAverage training accuracy: ' + str(ave_train_acc))
 print('Average validation accuracy: ' + str(ave_val_acc))
 

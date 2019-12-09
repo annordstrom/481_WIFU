@@ -18,7 +18,6 @@ from scipy import io
 import numpy as np
 from collections import Counter
 import random
-from keras.utils import to_categorical
 #from keras.preprocessing.image import ImageDataGenerator
 #from matplotlib import pyplot
 
@@ -169,7 +168,7 @@ brightness_scale = 64 # 1/4 full range (-127-127)
 for i in range(0, num_falls):
     augmented_falls[i] = fall_data[fall_indices[i],:] + brightness_scale
     
-# Augmentation 2-4, for posterity
+# Augmentation 2-4, for posterity (in future versions, improve augmentation styles)
 brightness_scale = -64
 for i in range(0, num_falls):
     augmented_falls[i + num_falls] = fall_data[fall_indices[i],:] + brightness_scale
@@ -184,50 +183,6 @@ fall_data = np.concatenate((fall_data, augmented_falls))
 fall_labels = np.concatenate((fall_labels, augmented_fall_labels))
 del augmented_falls, augmented_fall_labels, num_falls, fall_indices
 #%%
-# Find indices and count number of *sits*
-sit_indices = []
-for i in range(0, len(fall_labels)):
-    if fall_labels[i] == 2: # If sitting
-        sit_indices.append(i)
-num_sits = len(sit_indices)
-
-augmented_sits = np.zeros((2*num_sits, np.shape(fall_data)[1], np.shape(fall_data)[2], np.shape(fall_data)[3]), dtype=int)
-augmented_sit_labels = np.full((2*num_sits),2)
-
-# Augmentation 1: "Brightness" Augmentation
-brightness_scale = 64 # 1/4 full range (-127-127)
-for i in range(0, num_sits):
-    augmented_sits[i] = fall_data[sit_indices[i],:] + brightness_scale
-    
-# Augmentation 2, for posterity
-brightness_scale = -64
-for i in range(0, num_sits):
-    augmented_sits[i + num_sits] = fall_data[sit_indices[i],:] + brightness_scale
-
-
-fall_data = np.concatenate((fall_data, augmented_sits))
-fall_labels = np.concatenate((fall_labels, augmented_sit_labels))
-del augmented_sits, augmented_sit_labels, num_sits, sit_indices
-#%%
-# Find indices and count number of *lays*
-lay_indices = []
-for i in range(0, len(fall_labels)):
-    if fall_labels[i] == 4: # If laying
-        lay_indices.append(i)
-num_lays = len(lay_indices)
-
-augmented_lays = np.zeros((num_lays, np.shape(fall_data)[1], np.shape(fall_data)[2], np.shape(fall_data)[3]), dtype=int)
-augmented_lay_labels = np.full((num_lays),4)
-
-# Augmentation 1: "Brightness" Augmentation
-brightness_scale = 64 # 1/4 full range (-127-127)
-for i in range(0, num_lays):
-    augmented_lays[i] = fall_data[lay_indices[i],:] + brightness_scale
-
-fall_data = np.concatenate((fall_data, augmented_lays))
-fall_labels = np.concatenate((fall_labels, augmented_lay_labels))
-del augmented_lays, augmented_lay_labels, num_lays, lay_indices
-#%%
 
 # 3.) & 4.) Randomize data and one-hot encode labels
 print('\nRandomizing Data...')
@@ -240,8 +195,12 @@ for j in shuffled_indices:
     shuffled_fall_data[i] = fall_data[j]
     shuffled_fall_labels[i] = fall_labels[j]
     i += 1
-shuffled_fall_labels = shuffled_fall_labels - 1
-shuffled_fall_labels = to_categorical(shuffled_fall_labels)
+# Switching labels to 0 for fall and 1 for daily
+for i in range(0,len(fall_labels)):
+    if shuffled_fall_labels[i] == 1:
+        shuffled_fall_labels[i] = 0 # falls
+    else:
+        shuffled_fall_labels[i] = 1 # daily
 del fall_data, fall_labels
 print('Number of samples: ' + str(len(shuffled_fall_labels)))
 # 5.) Normalize data
