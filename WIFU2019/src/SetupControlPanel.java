@@ -299,8 +299,7 @@ public class SetupControlPanel extends javax.swing.JFrame {
                     "Please enter your zipcode");   
         }
         else{
-            this.setVisible(false);
-            new UserContacts().setVisible(true);
+           
         
             start.userFirstName = firstNameText.getText();
             start.userLastName = lastNameText.getText();
@@ -314,7 +313,8 @@ public class SetupControlPanel extends javax.swing.JFrame {
                 Component frame = null;
                 JOptionPane.showMessageDialog(frame,
                     "You have not selected your state");
-            
+                this.setVisible(false);
+                new UserContacts().setVisible(true);
             }
             else{
                 start.userState =jComboBox1.getSelectedItem().toString();
