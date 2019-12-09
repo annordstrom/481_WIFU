@@ -59,8 +59,8 @@ public class Main {
   
     public static void readForFall()throws IOException{
         // Switch to the first filename line when running on the pi
-        // String filename = "/home/pi/host.txt";
-        String filename = "C://testfile.txt";
+         String filename = "/home/pi/host.txt";
+        //String filename = "C://testfile.txt";
         File f = new File(filename);
         BufferedReader br = new BufferedReader(new FileReader(f));
         String line = br.readLine();
