@@ -15,7 +15,7 @@ import sys
 import numpy as np
 import keras
 from keras.models import Sequential
-from keras.layers import Conv2D, Dense, Flatten, Dropout, Activation, MaxPooling2D
+from keras.layers import Conv2D, Dense, Flatten, Dropout, MaxPooling2D, BatchNormalization
 from keras import optimizers
 
 from plot_confusion_matrix import pcm
@@ -25,6 +25,8 @@ Tasks:
     1. Train entire dataset
     2. export model
 """ 
+
+keras.backend.clear_session()
 
 # Load in data
 try: 
@@ -38,32 +40,32 @@ data_size = len(fall_data)
 fall_labels = np.load('fall_labels.npy')
 
 # Model Creation - input the model to be trained here (don't forget to call model.compile())
-
-model_name = 'binary_1'
+#%%
+model_name = 'binary_conv_2'
+epoch = 10
     
 model = Sequential()
-# 1st Convolutional Layer
-model.add(Conv2D(filters=256, input_shape=(150,30,12), kernel_size=(15,3), strides=(5,1), padding='valid'))
-model.add(Activation('sigmoid'))
+model.add(Conv2D(filters = 64, input_shape=(150,30,12), kernel_size = (13,4), strides = (4,2), padding = 'valid', activation = 'sigmoid'))
+#    model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size = (2,2)))
 model.add(Dropout(0.4))
-model.add(Conv2D(filters=256, kernel_size=(4,4), strides=(1,1)))
-model.add(Activation('sigmoid'))
-model.add(Dropout(0.4))
-model.add(Dense(1000, activation = 'sigmoid'))
+model.add(Conv2D(filters = 32, kernel_size = (2,2), strides = (2,2), activation = 'sigmoid'))
+#    model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size = (2,2)))
 model.add(Dropout(0.4))
 model.add(Flatten())
-model.add(Dense(1, activation = 'softmax'))
-#    model.add(Activation('softmax'))
-adam = optimizers.Adam(lr = 0.005)
-#    sgd = keras.optimizers.SGD(lr = 0.1, momentum = 0.0, nesterov = False)
+model.add(Dense(1, activation = 'sigmoid'))
 
-model.compile(loss=keras.losses.binary_crossentropy, optimizer=adam, metrics=['accuracy'])
+model.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizers.RMSprop(), metrics=['accuracy'])
 # *** END MODEL
 #%%
 
 # Train dataset and export model
+model.summary()
 print('Training...\n')
-metric = model.fit(x=fall_data, y=fall_labels)
+class_weights = {0: 0.727,
+                 1: 0.273} # Change as needed
+metric = model.fit(x=fall_data, y=fall_labels, class_weight=class_weights, epochs=epoch)
 print('Saving model...\n')
 model.save(os.getcwd() + os.sep + 'fall_detector.h5')
 #print('Training Accuracy: ' + str(metric['acc']))
@@ -71,5 +73,10 @@ model.save(os.getcwd() + os.sep + 'fall_detector.h5')
 #%%
 print('Predicting...')
 pred_y = model.predict(fall_data, verbose = 1)
-
-pcm(fall_labels, pred_y, classes = ['Falling', 'Daily Activity'], title='Confusion Matrix for All Data', name='confusion_matrix_' + model_name + '_trained')
+predicted_y = np.full(len(pred_y), 2)
+for i in range(len(pred_y)):
+    if pred_y[i] <= 0.5: # Falls
+        predicted_y[i] = 0
+    else: # Daily Activities
+        predicted_y[i] = 1
+pcm(fall_labels, predicted_y, classes = ['Falling', 'Daily Activity'], title='Confusion Matrix for All Data', name='confusion_matrix_' + model_name + '_trained')

@@ -68,6 +68,7 @@ print('Total test count: ' + str(data_count) + '\n')
 # Create proper sized data arrays
 fall_data = np.zeros((data_count * 13,150,12,30),int)
 fall_labels = np.zeros((data_count * 13),int)
+faulty_labels = []
 
 # Collect CSI data and labels
 print('Collecting data...')
@@ -107,10 +108,11 @@ for file_dir in os.listdir(os.getcwd()): # rotate through each subject folder
                     # Determine which label to use for the current sample, based on majority
                     first_ind = 0
                     end_ind = 150
+                    if file_labels[first_ind] == 0:
+                        faulty_labels.append(i)
+                        print('Faulty collection on ' + str(file) + ': labels appear as \'0\', meaning someone didn\'t collect data properly... Files will be deleted.')
                     for j in range(0,13):
                         # Count each label
-                        if file_labels[first_ind] == 0:
-                            print('Faulty collection on ' + str(file) + ': labels appear as \'0\', meaning someone didn\'t collect data properly... Nothing done now, these files will count as default \'5\'.')
                         occurence_count = Counter(file_labels[first_ind:end_ind])
                         fall_labels[13*i + j] = occurence_count.most_common(1)[0][0]
                         first_ind += 50
@@ -148,6 +150,9 @@ for file_dir in os.listdir(os.getcwd()): # rotate through each subject folder
                     print('Error on ' + file + ': "buffer is too small for requested array"')
             elif file.endswith('.mat'):
                 print('Corrupt file ' + file + ': .dat or .txt file does not exist for this .mat file.')
+# Remove faulty "0" labels
+np.delete(fall_data, faulty_labels, axis = 0)
+np.delete(fall_labels, faulty_labels, axis = 0)
 fall_data = np.swapaxes(fall_data, 2, 3) # Swap axes
 
 #%%
@@ -210,10 +215,11 @@ maxi = np.amax(shuffled_fall_data)
 
 print('Part 2 of Normalization...')
 
+# Use this line if possible in substitution of the below commented lines
 shuffled_fall_data = (shuffled_fall_data - mini)/(maxi - mini)
 
 # The below option is very time-consuming (more than 1hr for these 5 lines), so
-# avoid if you have enough RAM to use above commented call (8GB is not enough)
+# avoid if you have enough RAM to use above uncommented call (8GB is not enough)
 #for a in range(0,shuffled_fall_data.shape[0]):
 #    # print(str(a))
 #    for b in range(0,shuffled_fall_data.shape[1]):
