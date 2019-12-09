@@ -1,5 +1,7 @@
 #python Detection_Data_Creator.py "D:\University Files\WVU\Fall 2019\CS 481 - Capstone Implementation\testData"
 # If using on different computer, change above directory to full file location of testData
+# Lab computer:
+#"/home/matthew/Desktop/Fall Detection/testData"
 """
 Created on Mon Nov 18 10:37:22 2019
 Neural Network DATA COLLECTION code for WiFi-Based In-home Fall-detection Utility (WIFU)
@@ -9,6 +11,7 @@ python Detection_Data_Creator.py <testData directory>
 @author: Matthew Keaton
 """
 
+from time import time
 import os
 import sys
 from scipy import io
@@ -29,6 +32,8 @@ Tasks:
     6. Save training data and labels
 """ 
 
+start = time()
+
 #1.) Loading in training data and labels
 try: 
     os.chdir(sys.argv[1])
@@ -46,10 +51,15 @@ for file_dir in os.listdir(os.getcwd()): # rotate through each subject folder
         for file in os.listdir(dirpath): # rotate through each .mat file in each subject folder
             if file.endswith('.mat') and os.path.isfile(os.path.join(dirpath, (file[:-4] + '.dat')))and os.path.isfile(os.path.join(dirpath, (file[:-4] + '.txt'))):
                 filepath = os.path.join(os.getcwd(), file_dir, file)
-                mat_in = io.loadmat(filepath)
-                csi = np.asarray(mat_in['csi_data'])
-                if csi.shape == (750,2,3,30):
-                    folder_count += 1
+                try:
+                    mat_in = io.loadmat(filepath)
+                    csi = np.asarray(mat_in['csi_data'])
+                    if csi.shape == (750,2,3,30):
+                        folder_count += 1
+                except TypeError:
+                    print('Ignoring TypeError on ' + file + '...') # Do nothing
+                except ValueError:
+                    print('Ignoring ValueError on ' + file + '...') # Do nothing
             elif file.endswith('.mat'):
                 print('Corrupt file ' + file + ': .dat or .txt file does not exist for this .mat file.')
         print('Test count: ' + str(folder_count))
@@ -135,6 +145,8 @@ for file_dir in os.listdir(os.getcwd()): # rotate through each subject folder
                     i+=1
                 except ValueError:
                     print('Error on ' + file + ': Wrong array size. Data unusable. Size: ' + str(csi.shape))
+                except TypeError:
+                    print('Error on ' + file + ': "buffer is too small for requested array"')
             elif file.endswith('.mat'):
                 print('Corrupt file ' + file + ': .dat or .txt file does not exist for this .mat file.')
 fall_data = np.swapaxes(fall_data, 2, 3) # Swap axes
@@ -170,7 +182,7 @@ for i in range(0, num_falls):
 
 fall_data = np.concatenate((fall_data, augmented_falls))
 fall_labels = np.concatenate((fall_labels, augmented_fall_labels))
-del augmented_falls, augmented_fall_labels, num_falls
+del augmented_falls, augmented_fall_labels, num_falls, fall_indices
 #%%
 # Find indices and count number of *sits*
 sit_indices = []
@@ -195,7 +207,26 @@ for i in range(0, num_sits):
 
 fall_data = np.concatenate((fall_data, augmented_sits))
 fall_labels = np.concatenate((fall_labels, augmented_sit_labels))
-del augmented_sits, augmented_sit_labels, num_sits
+del augmented_sits, augmented_sit_labels, num_sits, sit_indices
+#%%
+# Find indices and count number of *lays*
+lay_indices = []
+for i in range(0, len(fall_labels)):
+    if fall_labels[i] == 4: # If laying
+        lay_indices.append(i)
+num_lays = len(lay_indices)
+
+augmented_lays = np.zeros((num_lays, np.shape(fall_data)[1], np.shape(fall_data)[2], np.shape(fall_data)[3]), dtype=int)
+augmented_lay_labels = np.full((num_lays),4)
+
+# Augmentation 1: "Brightness" Augmentation
+brightness_scale = 64 # 1/4 full range (-127-127)
+for i in range(0, num_lays):
+    augmented_lays[i] = fall_data[lay_indices[i],:] + brightness_scale
+
+fall_data = np.concatenate((fall_data, augmented_lays))
+fall_labels = np.concatenate((fall_labels, augmented_lay_labels))
+del augmented_lays, augmented_lay_labels, num_lays, lay_indices
 #%%
 
 # 3.) & 4.) Randomize data and one-hot encode labels
@@ -212,7 +243,7 @@ for j in shuffled_indices:
 shuffled_fall_labels = shuffled_fall_labels - 1
 shuffled_fall_labels = to_categorical(shuffled_fall_labels)
 del fall_data, fall_labels
-print(str(len(shuffled_fall_labels)))
+print('Number of samples: ' + str(len(shuffled_fall_labels)))
 # 5.) Normalize data
 print('\nPart 1 of Normalization...')
 mini = np.amin(shuffled_fall_data)
@@ -220,19 +251,22 @@ maxi = np.amax(shuffled_fall_data)
 
 print('Part 2 of Normalization...')
 
-#shuffled_fall_data = (shuffled_fall_data - mini)/(maxi - mini)
+shuffled_fall_data = (shuffled_fall_data - mini)/(maxi - mini)
 
 # The below option is very time-consuming (more than 1hr for these 5 lines), so
 # avoid if you have enough RAM to use above commented call (8GB is not enough)
-for a in range(0,shuffled_fall_data.shape[0]):
-    # print(str(a))
-    for b in range(0,shuffled_fall_data.shape[1]):
-        for c in range(0,shuffled_fall_data.shape[2]):
-            for d in range(0,shuffled_fall_data.shape[3]):
-                shuffled_fall_data[a][b][c][d] = (shuffled_fall_data[a][b][c][d] - mini)/(maxi - mini)
+#for a in range(0,shuffled_fall_data.shape[0]):
+#    # print(str(a))
+#    for b in range(0,shuffled_fall_data.shape[1]):
+#        for c in range(0,shuffled_fall_data.shape[2]):
+#            for d in range(0,shuffled_fall_data.shape[3]):
+#                shuffled_fall_data[a][b][c][d] = (shuffled_fall_data[a][b][c][d] - mini)/(maxi - mini)
 
 # 6.) Save data
-print('\n Saving data and labels...')
+print('\nSaving data and labels...')
 np.save('fall_data', shuffled_fall_data)
 np.save('fall_labels', shuffled_fall_labels)
 print('\nCompleted.')
+
+end = time()
+print('Total Running Time: {:0.3f} seconds.'.format(end-start))

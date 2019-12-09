@@ -10,11 +10,13 @@ python Detection_Model_Trainer.py <testData directory>
 @author: Matth
 """
 
+from time import time
 import os
 import sys
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D, Activation, Dropout
+from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D, Activation, Dropout, BatchNormalization
+from keras import optimizers
 import keras
 from plot_confusion_matrix import pcm
 
@@ -24,12 +26,14 @@ Tasks:
     2. Perform Cross Validation and obtain accuracy
 """ 
 
+start = time()
+
 try: 
     os.chdir(sys.argv[1])
 except FileNotFoundError:
     sys.exit('Provided File directory not found. Exiting program.')
 
-print('Loading data...')
+print('Loading data...\n')
 fall_data = np.load('fall_data.npy')
 data_size = len(fall_data)
 fall_labels = np.load('fall_labels.npy')
@@ -55,21 +59,29 @@ for i in range(0, folds):
     
     #Fresh model generation
     
-    model_name = 'simplest_model_1'
+    model_name = 'long_1'
     
     model = Sequential()
     # 1st Convolutional Layer
     model.add(Conv2D(filters=256, input_shape=(150,30,12), kernel_size=(15,3), strides=(5,1), padding='valid'))
     model.add(Activation('sigmoid'))
     model.add(Dropout(0.4))
+    model.add(Conv2D(filters=256, kernel_size=(4,4), strides=(1,1)))
+    model.add(Activation('sigmoid'))
+    model.add(Dropout(0.4))
+    model.add(Dense(1000, activation = 'sigmoid'))
+    model.add(Dropout(0.4))
     model.add(Flatten())
     model.add(Dense(5, activation = 'softmax'))
-#    model.add(Activation('softmax'))
-    model.compile(loss=keras.losses.categorical_crossentropy, optimizer='adam', metrics=['accuracy'])
+    #    model.add(Activation('softmax'))
+#    adam = optimizers.Adam(lr = 0.005)
+    sgd = keras.optimizers.SGD(lr = 0.1, momentum = 0.0, nesterov = False)
+    
+    model.compile(loss=keras.losses.categorical_crossentropy, optimizer=sgd, metrics=['accuracy'])
     
     # *** END MODEL
     
-    metric = model.fit(x=train_x, y=train_y, validation_data=(val_x,val_y), verbose=1, epochs=1).history
+    metric = model.fit(x=train_x, y=train_y, validation_data=(val_x,val_y), verbose=1, epochs=3).history
     print('Training Accuracy: ' + str(metric['acc']))
     print('Validation Accuracy: ' + str(metric['val_acc']))
     metrics[i+1] = (metric['acc'], metric['val_acc'])
@@ -80,7 +92,7 @@ for i in range(0, folds):
     pred_val_y = model.predict(val_x, verbose = 1)
     # turning predicted weights into list of predicted labels (for confusion matrix)
     pred_vals = np.zeros((pred_val_y.shape[0],1))
-    for j in range(0,pred_val_y.shape[0]):
+    for j in range(0, pred_val_y.shape[0]):
         max_val = 0
         max_ind = 0
         for k in range(0,pred_val_y.shape[1]):
@@ -88,14 +100,12 @@ for i in range(0, folds):
                 max_ind = k
                 max_val = pred_val_y[j][k]
         pred_vals[j] = max_ind
-    # turning one-hot encoding into multiclass encoding (for confusion matrix)
+    # turning one-hot encoded ground truth into multiclass encoding (for confusion matrix)
     uncat_val_y = np.zeros((val_y.shape[0],1))
     for j in range(0, uncat_val_y.shape[0]):
-        max_ind = 0
         for k in range(0,val_y.shape[1]):
             if val_y[j][k] == 1:
-                max_ind = k
-        uncat_val_y[j] = max_ind
+                uncat_val_y[j] = k
     # Create confusion matrix, display, and save
     pcm(uncat_val_y, pred_vals, classes = ['Falling', 'Sitting', 'Walking', 'Laying', 'Standing'], title='Confusion Matrix for Fold ' + str(i+1), name='confusion_matrix - ' + model_name + '_fold' + str(i+1))
     pred_list = np.append(pred_list, pred_vals)
@@ -106,3 +116,6 @@ for i in range(0, folds):
 pcm(val_list, pred_list, classes = ['Falling', 'Sitting', 'Walking', 'Laying', 'Standing'], title='Confusion Matrix for All Folds', name='confusion_matrix_' + model_name + '_overall')
 print('\nAverage training accuracy: ' + str(ave_train_acc))
 print('Average validation accuracy: ' + str(ave_val_acc))
+
+end = time()
+print('Total Running Time: {:0.3f} seconds.'.format(end-start))
