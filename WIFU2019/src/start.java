@@ -1,4 +1,3 @@
-
 import java.awt.Component;
 import java.awt.Font;
 import java.util.HashMap;
@@ -6,22 +5,12 @@ import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author dagma
- */
 public class start extends javax.swing.JFrame {
     public static final int User = 0, Setup = 1;
     public static DefaultListModel dlm = new DefaultListModel();
     public static String[][] contacts = new String[5][5];
     public static int deletedEntry = -1;
-    public static int count=0;//IMPORTANT COUNT THING!!!!!!!
+    public static int count=0;
     public static String userFirstName;
     public static String userLastName;
     public static String userStreet;
@@ -146,15 +135,12 @@ public class start extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void userFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userFieldActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_userFieldActionPerformed
 
     private void passFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passFieldActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_passFieldActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
       // TODO add your handling code here:
         HashMap<String, Integer> logins = new HashMap<String, Integer>();
         logins.put("User,Pass", User);
