@@ -10,6 +10,7 @@ External jar needs to be added to Libraries for Java Mail to work
 This jar is javax.mail.jar
 
 ## 12/9/2019
-Updated with the latest version of the GUI, adding fixes for the notification process
-NOTE: the old version of the gui needs removed from this git repo; WIFU2019 is the correct version to use
+Updated with the latest version of the GUI, adding fixes for the notification process.
 
+## 12/10/2019
+Old gui version removed
