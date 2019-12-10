@@ -6,20 +6,7 @@ import java.util.LinkedList;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author dagma
- */
-
 public class UserContacts extends javax.swing.JFrame {
-    
-    
-    
     /**
      * Creates new form SetupContacts
      */
@@ -263,15 +250,11 @@ public class UserContacts extends javax.swing.JFrame {
                   Component frame = null;
                     JOptionPane.showMessageDialog(frame,
                     "There is a 5 contact limit, please delete a contact before you add another");  
-                    //disable add button
-                    //disable name and phone typing too?????
                     }
             else if(phoneNum.length() != 10 || !phoneNum.matches("[0-9]+")){
                   Component frame = null;
                     JOptionPane.showMessageDialog(frame,
-                    "The phone number entered does not meet the proper format (10 numerical digits)!");  
-                    //disable add button
-                    //disable name and phone typing too?????
+                    "The phone number entered does not meet the proper format (10 numerical digits)!"); 
                     }
             else if(nameText.getText().isEmpty() || nameText.getText()==null){
                    Component frame = null;
@@ -287,8 +270,6 @@ public class UserContacts extends javax.swing.JFrame {
                   Component frame = null;
                     JOptionPane.showMessageDialog(frame,
                     "The phone number entered does not meet the proper format (10 numerical digits)!");  
-                    //disable add button
-                    //disable name and phone typing too?????
                     }
                 else if(nameText.getText().isEmpty() || nameText.getText()==null){
                    Component frame = null;
@@ -333,7 +314,6 @@ public class UserContacts extends javax.swing.JFrame {
     }//GEN-LAST:event_addActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
-        // TODO add your handling code here:
         start.deletedEntry = contactList.getSelectedIndex();
         start.dlm.removeElement(start.contacts[start.deletedEntry][0]);
         contactList.setModel(start.dlm);
@@ -344,14 +324,12 @@ public class UserContacts extends javax.swing.JFrame {
     }//GEN-LAST:event_deleteActionPerformed
 
     private void MainMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MainMenuActionPerformed
-        // TODO add your handling code here:
           this.setVisible(false);
           new ControlPanelUser().setVisible(true);
         
     }//GEN-LAST:event_MainMenuActionPerformed
 
     private void finishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finishActionPerformed
-        // TODO add your handling code here:
         Component frame = null;
             JOptionPane.showMessageDialog(frame,
     "Great! Setup of contacts has been completed");
@@ -360,7 +338,6 @@ public class UserContacts extends javax.swing.JFrame {
     }//GEN-LAST:event_finishActionPerformed
 
     private void nameTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameTextActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_nameTextActionPerformed
 
     /**
