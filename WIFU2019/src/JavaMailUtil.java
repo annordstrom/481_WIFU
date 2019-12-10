@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 
 import java.util.Properties;
 
@@ -39,8 +33,7 @@ public class JavaMailUtil {
 		Message message = prepareMessage(session, myAccountEmail, recepient, user, time, date, okay);
 		
 		Transport.send(message);
-		System.out.println("Message sent successfully");
-		
+		System.out.println("Message sent successfully");	
 	}
 	
 	private static Message prepareMessage(Session session, String myAccountEmail, String recepient, String user, String time, String date, boolean okay) {
@@ -65,7 +58,6 @@ public class JavaMailUtil {
                                     return message;
                                 }
 			} catch (MessagingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return null;
