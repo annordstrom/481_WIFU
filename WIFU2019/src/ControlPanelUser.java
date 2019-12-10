@@ -1,16 +1,4 @@
 
-
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author dagma
- */
 public class ControlPanelUser extends javax.swing.JFrame {
     boolean userFall = false;
     static void createDialog(start aThis) {
@@ -102,19 +90,16 @@ public class ControlPanelUser extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
  
     private void fallDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fallDataActionPerformed
-        // TODO add your handling code here:
           this.setVisible(false);
           new UserFallData().setVisible(true);
     }//GEN-LAST:event_fallDataActionPerformed
 
-    private void settingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsActionPerformed
-        // TODO add your handling code here:
+    private void settingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsActionPerformed       
           this.setVisible(false);
           new Settings().setVisible(true);
     }//GEN-LAST:event_settingsActionPerformed
 
-    private void contactsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contactsActionPerformed
-        // TODO add your handling code here:
+    private void contactsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:
           this.setVisible(false);
           new UserContacts().setVisible(true);
     }//GEN-LAST:event_contactsActionPerformed
