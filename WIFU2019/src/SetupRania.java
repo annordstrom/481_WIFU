@@ -1,20 +1,7 @@
-
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JOptionPane;
 
-
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author dagma
- */
 public class SetupRania extends javax.swing.JFrame {
 
     /**
@@ -153,7 +140,6 @@ public class SetupRania extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void noRaniaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noRaniaActionPerformed
-        // TODO add your handling code here:
             password.setBackground(Color.gray);
             userName.setBackground(Color.GRAY);
             password.setEnabled(false);
@@ -163,17 +149,14 @@ public class SetupRania extends javax.swing.JFrame {
     }//GEN-LAST:event_noRaniaActionPerformed
 
     private void userNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userNameActionPerformed
-        // TODO add your handling code here:
         submitBtnActionPerformed(evt);
     }//GEN-LAST:event_userNameActionPerformed
 
     private void passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordActionPerformed
-        // TODO add your handling code here:
         submitBtnActionPerformed(evt);
     }//GEN-LAST:event_passwordActionPerformed
 
     private void submitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitBtnActionPerformed
-        // TODO add your handling code here:
        if(noRania.isSelected()){
         new SetupControlPanel().setVisible(true);
         this.setVisible(false);
@@ -195,7 +178,6 @@ public class SetupRania extends javax.swing.JFrame {
     }//GEN-LAST:event_submitBtnActionPerformed
 
     private void yesRaniaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yesRaniaActionPerformed
-        // TODO add your handling code here:
         password.setBackground(Color.WHITE);
             userName.setBackground(Color.WHITE);
             password.setEnabled(true);
