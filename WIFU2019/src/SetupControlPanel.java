@@ -2,16 +2,6 @@
 import java.awt.Component;
 import javax.swing.JOptionPane;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author dagma
- */
 public class SetupControlPanel extends javax.swing.JFrame {
     
      
@@ -214,11 +204,9 @@ public class SetupControlPanel extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void zipTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zipTextActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_zipTextActionPerformed
 
     private void MainMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MainMenuActionPerformed
-        // TODO add your handling code here:
         
         if(firstNameText.getText().isEmpty() || firstNameText.getText()==null){
             Component frame = null;
@@ -272,7 +260,6 @@ public class SetupControlPanel extends javax.swing.JFrame {
     }//GEN-LAST:event_MainMenuActionPerformed
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
-        // TODO add your handling code here:
        if(firstNameText.getText().isEmpty() || firstNameText.getText()==null){
             Component frame = null;
                     JOptionPane.showMessageDialog(frame,
@@ -326,7 +313,6 @@ public class SetupControlPanel extends javax.swing.JFrame {
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
