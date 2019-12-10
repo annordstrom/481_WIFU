@@ -1,13 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author dagma
- */
 public class Settings extends javax.swing.JFrame {
 
     /**
@@ -103,19 +93,16 @@ public class Settings extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void raniaBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_raniaBtnActionPerformed
-        // TODO add your handling code here:
           this.setVisible(false);
           new SetupRania().setVisible(true);
     }//GEN-LAST:event_raniaBtnActionPerformed
 
     private void userBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userBtnActionPerformed
-        // TODO add your handling code here:
           this.setVisible(false);
           new SetupControlPanel().setVisible(true);
     }//GEN-LAST:event_userBtnActionPerformed
 
     private void MainMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MainMenuActionPerformed
-        // TODO add your handling code here:
           this.setVisible(false);
            new ControlPanelUser().setVisible(true);
     }//GEN-LAST:event_MainMenuActionPerformed
