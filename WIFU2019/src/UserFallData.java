@@ -4,17 +4,6 @@ import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author dagma
- */
 public class UserFallData extends javax.swing.JFrame {
 
     /**
@@ -126,15 +115,12 @@ public class UserFallData extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void fallDataTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fallDataTableMouseClicked
-        // TODO add your handling code here:
     }//GEN-LAST:event_fallDataTableMouseClicked
 
     private void fallDataTableMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_fallDataTableMousePressed
-        // TODO add your handling code here:
     }//GEN-LAST:event_fallDataTableMousePressed
 
     private void MainMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MainMenu1ActionPerformed
-        // TODO add your handling code here:
         
            this.setVisible(false);
         new ControlPanelUser().setVisible(true);

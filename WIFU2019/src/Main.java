@@ -17,24 +17,12 @@ import javax.mail.MessagingException;
 import javax.swing.JOptionPane;
 import javax.swing.plaf.FontUIResource;
 
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author dagma
- */
 public class Main {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException{
-        // TODO code application logic here
         start form = new start();
         form.setVisible(true);
         readForFall();
@@ -58,7 +46,7 @@ public class Main {
     }
   
     public static void readForFall()throws IOException{
-        // Switch to the first filename line when running on the pi
+        // Switch to the second filename line when running on the desktop
          String filename = "/home/pi/host.txt";
         //String filename = "C://testfile.txt";
         File f = new File(filename);

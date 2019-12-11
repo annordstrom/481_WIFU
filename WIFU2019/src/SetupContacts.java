@@ -1,17 +1,6 @@
-//Get code from UserContacts. I almost had a gddam heart attack!
 import java.awt.Component;
 import javax.swing.JOptionPane;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author dagma
- */
 public class SetupContacts extends javax.swing.JFrame {
 
     String[] careGivers = new String[5];
@@ -238,9 +227,9 @@ public class SetupContacts extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addActionPerformed
-        Object selectedItem = cellProviderDrop.getSelectedItem(); //look into value being reset on click??? possible error
+        Object selectedItem = cellProviderDrop.getSelectedItem(); 
         String cellCarrier = selectedItem.toString();
-        String phoneNum = phoneNumberString.getText(); //look into value being reset on click??? possible error
+        String phoneNum = phoneNumberString.getText();
         String smsGateway = "";
 
         cellCarrier = cellCarrier.toLowerCase();
@@ -280,23 +269,18 @@ public class SetupContacts extends javax.swing.JFrame {
     }//GEN-LAST:event_addActionPerformed
 
     private void editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_editActionPerformed
 
     private void moveUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveUpActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_moveUpActionPerformed
 
     private void moveDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_moveDownActionPerformed
 
     private void previousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_previousActionPerformed
 
     private void finishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_finishActionPerformed
-        // TODO add your handling code here:
         Component frame = null;
             JOptionPane.showMessageDialog(frame,
     "Great! setup has been completed");
