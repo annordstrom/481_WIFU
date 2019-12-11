@@ -22,6 +22,8 @@ public class start extends javax.swing.JFrame {
     // Text message to contacts
     public static String userFullName;
     public static boolean okay = false;
+    public static int delay = 0;
+    public static int period = 3000;
     
     
     //table info for fall data
