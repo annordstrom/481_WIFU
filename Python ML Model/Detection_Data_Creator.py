@@ -151,42 +151,43 @@ for file_dir in os.listdir(os.getcwd()): # rotate through each subject folder
             elif file.endswith('.mat'):
                 print('Corrupt file ' + file + ': .dat or .txt file does not exist for this .mat file.')
 # Remove faulty "0" labels
+print(str(len(fall_data)))
 np.delete(fall_data, faulty_labels, axis = 0)
 np.delete(fall_labels, faulty_labels, axis = 0)
 fall_data = np.swapaxes(fall_data, 2, 3) # Swap axes
-
+print(str(len(fall_data)))
 #%%
-print('Performing Data Augmentation...')
-# 2.) Data Augmentation!
-# Find indices and count number of *falls*
-fall_indices = []
-for i in range(0, len(fall_labels)):
-    if fall_labels[i] == 1: # If fall
-        fall_indices.append(i)
-num_falls = len(fall_indices)
-#%%
-augmented_falls = np.zeros((4*num_falls, np.shape(fall_data)[1], np.shape(fall_data)[2], np.shape(fall_data)[3]), dtype=int)
-augmented_fall_labels = np.ones(4*num_falls)
-
-# Augmentation 1: "Brightness" Augmentation
-brightness_scale = 64 # 1/4 full range (-127-127)
-for i in range(0, num_falls):
-    augmented_falls[i] = fall_data[fall_indices[i],:] + brightness_scale
-    
-# Augmentation 2-4, for posterity (in future versions, improve augmentation styles)
-brightness_scale = -64
-for i in range(0, num_falls):
-    augmented_falls[i + num_falls] = fall_data[fall_indices[i],:] + brightness_scale
-brightness_scale = 32
-for i in range(0, num_falls):
-    augmented_falls[i + num_falls*2] = fall_data[fall_indices[i],:] + brightness_scale
-brightness_scale = -32
-for i in range(0, num_falls):
-    augmented_falls[i + num_falls*3] = fall_data[fall_indices[i],:] + brightness_scale
-
-fall_data = np.concatenate((fall_data, augmented_falls))
-fall_labels = np.concatenate((fall_labels, augmented_fall_labels))
-del augmented_falls, augmented_fall_labels, num_falls, fall_indices
+#print('Performing Data Augmentation...')
+## 2.) Data Augmentation!
+## Find indices and count number of *falls*
+#fall_indices = []
+#for i in range(0, len(fall_labels)):
+#    if fall_labels[i] == 1: # If fall
+#        fall_indices.append(i)
+#num_falls = len(fall_indices)
+##%%
+#augmented_falls = np.zeros((4*num_falls, np.shape(fall_data)[1], np.shape(fall_data)[2], np.shape(fall_data)[3]), dtype=int)
+#augmented_fall_labels = np.ones(4*num_falls)
+#
+## Augmentation 1: No current Augmentation
+#
+#for i in range(0, num_falls):
+#    augmented_falls[i] = fall_data[fall_indices[i],:]*0.95
+#    
+## Augmentation 2-4, for posterity (in future versions, improve augmentation styles)
+#    
+#for i in range(0, num_falls):
+#    augmented_falls[i + num_falls] = fall_data[fall_indices[i],:]*0.9
+#
+##for i in range(0, num_falls):
+##    augmented_falls[i + num_falls*2] = fall_data[fall_indices[i],:]*0.85
+##
+##for i in range(0, num_falls):
+##    augmented_falls[i + num_falls*3] = fall_data[fall_indices[i],:]*0.8
+#
+#fall_data = np.concatenate((fall_data, augmented_falls))
+#fall_labels = np.concatenate((fall_labels, augmented_fall_labels))
+#del augmented_falls, augmented_fall_labels, num_falls, fall_indices
 #%%
 
 # 3.) & 4.) Randomize data and one-hot encode labels
@@ -209,11 +210,10 @@ for i in range(0,len(fall_labels)):
 del fall_data, fall_labels
 print('Number of samples: ' + str(len(shuffled_fall_labels)))
 # 5.) Normalize data
-print('\nPart 1 of Normalization...')
+
+print('Normalizing...')
 mini = np.amin(shuffled_fall_data)
 maxi = np.amax(shuffled_fall_data)
-
-print('Part 2 of Normalization...')
 
 # Use this line if possible in substitution of the below commented lines
 shuffled_fall_data = (shuffled_fall_data - mini)/(maxi - mini)

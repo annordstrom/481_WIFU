@@ -40,6 +40,14 @@ fall_data = np.load('fall_data.npy')
 data_size = len(fall_data)
 fall_labels = np.load('fall_labels.npy')
 
+unique, counts = np.unique(fall_labels, return_counts=True)
+fall_percent = counts[0]/len(fall_labels)
+fall_weight = 1-fall_percent
+daily_percent = counts[1]/len(fall_labels)
+daily_weight = 1-daily_percent
+class_weights = {0: fall_weight,
+                 1: fall_percent} # Change as needed
+
 #%%
 folds = 5
 metrics = {}
@@ -60,22 +68,20 @@ for i in range(0, folds):
         train_y = np.concatenate((fall_labels[0:i*data_size//folds], fall_labels[(i+1)*data_size//folds:]))
     
     #Fresh model generation
-    model_name = 'binary_conv_BN_1'
-    epoch = 10
+    model_name = 'binary_dense_cbrt_2'
+    epoch = 1
     
     model = Sequential()
-    model.add(Conv2D(filters = 64, input_shape=(150,30,12), kernel_size = (13,4), strides = (4,2), padding = 'valid', activation = 'sigmoid'))
-#    model.add(BatchNormalization())
-    model.add(MaxPooling2D(pool_size = (2,2)))
-    model.add(Dropout(0.4))
-    model.add(Conv2D(filters = 32, kernel_size = (2,2), strides = (2,2), activation = 'sigmoid'))
-#    model.add(BatchNormalization())
-    model.add(MaxPooling2D(pool_size = (2,2)))
-    model.add(Dropout(0.4))
+
+    model.add(Dense(720, input_shape=(150,30,12), activation = 'relu'))
+#    model.add()
+    model.add(Dropout(.4))
+    model.add(Dense(25))
+    model.add(Dropout(.5))
     model.add(Flatten())
     model.add(Dense(1, activation = 'sigmoid'))
-    
-    model.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizers.RMSprop(), metrics=['accuracy'])
+
+    model.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizers.Adam(lr=0.00025), metrics=['accuracy'])
     # *** END MODEL
     
     if i == 0:
@@ -83,9 +89,6 @@ for i in range(0, folds):
         print('Saving model...')
         model.save('Testing_' + model_name)
         model.summary()
-        
-    class_weights = {0: 0.727,
-                     1: 0.273} # Change as needed
     
     metric = model.fit(x=train_x, y=train_y, validation_data=(val_x,val_y), verbose=1, epochs=epoch, class_weight=class_weights).history
     print('Training Accuracy: ' + str(metric['acc']))
@@ -112,6 +115,28 @@ for i in range(0, folds):
 pcm(val_list, pred_list, classes = ['Falling', 'Daily Activity'], title='Confusion Matrix for All Folds', name='confusion_matrix_' + model_name + '_overall')
 print('\nAverage training accuracy: ' + str(ave_train_acc))
 print('Average validation accuracy: ' + str(ave_val_acc))
-
+# Below only works for binary classification: measurement for precision and recall
+t_p = 0
+t_n = 0
+f_p = 0
+f_n = 0
+for i in range(0, len(val_list)):
+    if val_list[i] == 0 and pred_list[i] == 0: # True Positive
+        t_p += 1
+    elif val_list[i] == 1 and pred_list[i] == 1: # True Negative
+        t_n += 1
+    elif val_list[i] == 1 and pred_list[i] == 0: # False Positive
+        f_p += 1
+    else:
+        f_n += 1
+precision = t_p / (t_p + f_p)
+recall = t_p / (t_p + f_n)
+t = open(model_name + 'PvR.txt', 'w+')
+t.write('Precision: ' + str(precision))
+t.write('\nRecall: ' + str(recall))
+t.close()
+print('Precision: ' + str(precision))
+print('Recall: ' + str(recall))
+print('')
 end = time()
 print('Total Running Time: {:0.3f} seconds.'.format(end-start))

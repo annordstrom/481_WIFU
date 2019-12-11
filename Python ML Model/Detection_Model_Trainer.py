@@ -17,7 +17,7 @@ import keras
 from keras.models import Sequential
 from keras.layers import Conv2D, Dense, Flatten, Dropout, MaxPooling2D, BatchNormalization
 from keras import optimizers
-
+from time import time
 from plot_confusion_matrix import pcm
 
 """
@@ -25,6 +25,8 @@ Tasks:
     1. Train entire dataset
     2. export model
 """ 
+
+start = time()
 
 keras.backend.clear_session()
 
@@ -38,33 +40,34 @@ print('Loading data...\n')
 fall_data = np.load('fall_data.npy')
 data_size = len(fall_data)
 fall_labels = np.load('fall_labels.npy')
+#%%
+unique, counts = np.unique(fall_labels, return_counts=True)
+fall_percent = counts[0]/len(fall_labels)
+fall_weight = 1-fall_percent
+daily_percent = counts[1]/len(fall_labels)
+daily_weight = 1-daily_percent
+
+class_weights = {0: fall_weight,
+                 1: daily_weight} # Change as needed
 
 # Model Creation - input the model to be trained here (don't forget to call model.compile())
-#%%
-model_name = 'binary_conv_2'
+model_name = 'binary_dense_3'
 epoch = 10
     
 model = Sequential()
-model.add(Conv2D(filters = 64, input_shape=(150,30,12), kernel_size = (13,4), strides = (4,2), padding = 'valid', activation = 'sigmoid'))
-#    model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size = (2,2)))
-model.add(Dropout(0.4))
-model.add(Conv2D(filters = 32, kernel_size = (2,2), strides = (2,2), activation = 'sigmoid'))
-#    model.add(BatchNormalization())
-model.add(MaxPooling2D(pool_size = (2,2)))
-model.add(Dropout(0.4))
+
+model.add(Dense(12, input_shape=(150,30,12)))
+model.add(Dense(6))
 model.add(Flatten())
 model.add(Dense(1, activation = 'sigmoid'))
 
-model.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizers.RMSprop(), metrics=['accuracy'])
+model.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizers.Adam(), metrics=['accuracy'])
 # *** END MODEL
 #%%
 
 # Train dataset and export model
 model.summary()
 print('Training...\n')
-class_weights = {0: 0.727,
-                 1: 0.273} # Change as needed
 metric = model.fit(x=fall_data, y=fall_labels, class_weight=class_weights, epochs=epoch)
 print('Saving model...\n')
 model.save(os.getcwd() + os.sep + 'fall_detector.h5')
@@ -80,3 +83,6 @@ for i in range(len(pred_y)):
     else: # Daily Activities
         predicted_y[i] = 1
 pcm(fall_labels, predicted_y, classes = ['Falling', 'Daily Activity'], title='Confusion Matrix for All Data', name='confusion_matrix_' + model_name + '_trained')
+
+end = time()
+print('Total Running Time: {:0.3f} seconds.'.format(end-start))
