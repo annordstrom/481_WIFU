@@ -1,5 +1,8 @@
-#python Detection_Accuracy_Tester.py "D:\University Files\WVU\Fall 2019\CS 481 - Capstone Implementation\testData"
+#python Detection_Accuracy_Tester.py "<filepath>/testData"
 # If using on different computer, change above directory to full file location of testData
+
+# Tip - To load in old saved models:
+# new_model = keras.models.load_model('<model_path>/<model_file>')
 """
 Created on Mon Dec  2 22:06:49 2019
 Neural Network TESTING code for WiFi-Based In-home Fall-detection Utility (WIFU)
@@ -15,7 +18,7 @@ import os
 import sys
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D, Dropout, BatchNormalization
+from keras.layers import Dense, Flatten, Dropout, BatchNormalization, Activation
 from keras import optimizers
 import keras
 from plot_confusion_matrix import pcm
@@ -68,23 +71,31 @@ for i in range(0, folds):
         train_y = np.concatenate((fall_labels[0:i*data_size//folds], fall_labels[(i+1)*data_size//folds:]))
     
     #Fresh model generation
-    model_name = 'binary_dense_cbrt_2'
-    epoch = 1
+    model_name = 'Keatwood_14'
+    epoch = 15
     
     model = Sequential()
 
-    model.add(Dense(720, input_shape=(150,30,12), activation = 'relu'))
-#    model.add()
-    model.add(Dropout(.4))
-    model.add(Dense(25))
-    model.add(Dropout(.5))
+    model.add(Dense(16, input_shape=(150,30,12)))
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
     model.add(Flatten())
-    model.add(Dense(1, activation = 'sigmoid'))
+    model.add(Dense(8))
+    model.add(Dropout(0.4)) # SHERWOOD 9 had 0.4
+    model.add(BatchNormalization())
+    model.add(Activation('relu'))
+    model.add(Dense(1))
+    model.add(Activation('sigmoid'))
 
-    model.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizers.Adam(lr=0.00025), metrics=['accuracy'])
+    model.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizers.Adam(), metrics=['accuracy'])
     # *** END MODEL
     
     if i == 0:
+        # Make directory for results
+        cdir = sys.argv[1][:-8]
+        cdir = cdir + '481_WIFU' + os.sep + 'Python ML Model' + os.sep + 'Confusion Matrices and Models' + os.sep + model_name + '_CM_M'
+        os.mkdir(cdir)
+        os.chdir(cdir)
         # Save initialized model before training (only needs to be done once)
         print('Saving model...')
         model.save('Testing_' + model_name)
@@ -106,13 +117,14 @@ for i in range(0, folds):
         else: # Daily Activities
             predicted_y[j] = 1
     # Create confusion matrix, display, and save
-    pcm(val_y, predicted_y, classes = ['Falling', 'Daily Activity'], title='Confusion Matrix for Fold ' + str(i+1), name='confusion_matrix - ' + model_name + '_fold' + str(i+1))
+    pcm(val_y, predicted_y, classes = ['Falling', 'Daily Activity'], title='Confusion Matrix for Fold ' + str(i+1), name='confusion_matrix - '+model_name+'_fold'+str(i+1), directory=cdir)
     pred_list = np.append(pred_list, predicted_y)
     val_list = np.append(val_list, val_y)
     del val_x, val_y, train_x, train_y
 
 # Create overall confusion matrix and print overall accuracy
-pcm(val_list, pred_list, classes = ['Falling', 'Daily Activity'], title='Confusion Matrix for All Folds', name='confusion_matrix_' + model_name + '_overall')
+
+pcm(val_list, pred_list, classes = ['Falling', 'Daily Activity'], title='Confusion Matrix for All Folds', name='confusion_matrix_' + model_name + '_overall', directory=cdir)
 print('\nAverage training accuracy: ' + str(ave_train_acc))
 print('Average validation accuracy: ' + str(ave_val_acc))
 # Below only works for binary classification: measurement for precision and recall
@@ -127,10 +139,16 @@ for i in range(0, len(val_list)):
         t_n += 1
     elif val_list[i] == 1 and pred_list[i] == 0: # False Positive
         f_p += 1
-    else:
+    else: # val_list[i] == 0 and pred_list[i] == 1: False Negative
         f_n += 1
-precision = t_p / (t_p + f_p)
-recall = t_p / (t_p + f_n)
+if t_p + f_p == 0:
+    precision = 0
+else:
+    precision = t_p / (t_p + f_p)
+if t_p + f_n == 0:
+    recall = 0
+else:
+    recall = t_p / (t_p + f_n)
 t = open(model_name + 'PvR.txt', 'w+')
 t.write('Precision: ' + str(precision))
 t.write('\nRecall: ' + str(recall))
@@ -140,3 +158,4 @@ print('Recall: ' + str(recall))
 print('')
 end = time()
 print('Total Running Time: {:0.3f} seconds.'.format(end-start))
+print('Model name: ' + model_name)

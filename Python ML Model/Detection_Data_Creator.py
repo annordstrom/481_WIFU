@@ -1,7 +1,5 @@
-#python Detection_Data_Creator.py "D:\University Files\WVU\Fall 2019\CS 481 - Capstone Implementation\testData"
+#python Detection_Data_Creator.py "<filepath>/testData"
 # If using on different computer, change above directory to full file location of testData
-# Lab computer:
-#"/home/matthew/Desktop/Fall Detection/testData"
 """
 Created on Mon Nov 18 10:37:22 2019
 Neural Network DATA COLLECTION code for WiFi-Based In-home Fall-detection Utility (WIFU)
@@ -158,7 +156,7 @@ fall_data = np.swapaxes(fall_data, 2, 3) # Swap axes
 print(str(len(fall_data)))
 #%%
 #print('Performing Data Augmentation...')
-## 2.) Data Augmentation!
+## 2.) Data Augmentation! Only use if necessary. The following augmentations don't train well. Other options may be Gaussian noise, inverting signal, etc.
 ## Find indices and count number of *falls*
 #fall_indices = []
 #for i in range(0, len(fall_labels)):
