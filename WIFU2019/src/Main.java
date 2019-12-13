@@ -27,8 +27,8 @@ public class Main {
         form.setVisible(true);
         readForFall();
         
-        //set in start    start.delay = 0; // delay for 0 sec. 
-        //set in start   start.period = 3000; // repeat every 3 sec. 
+        int delay = 0; // delay for 0 sec. 
+        int period = 3000; // repeat every 3 sec. 
         Timer timer = new Timer(); 
         timer.scheduleAtFixedRate(new TimerTask() 
         { 
@@ -56,16 +56,12 @@ public class Main {
         
         //if the file currently contains a 1 (fall), overwrite the filecontents so that falls only get logged once
         if (line.equals("1")){
-            start.period = 300000;
             start.userFell = true;
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             bw.write("0");
             bw.close();
         }
-        else {
-            start.period = 3000;
-            start.userFell = false;
-        }
+        else start.userFell = false;
         
         /*  This tells the GUI what to do when a fall is detected:
         *   1. Log the fall date/time in the local fall data page
